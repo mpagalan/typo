@@ -67,7 +67,7 @@ class InitialSchema < ActiveRecord::Migration
 
     add_index "contents", ["published"], :name => "index_contents_on_published"
     add_index "contents", ["text_filter_id"], :name => "index_contents_on_text_filter_id"
-
+    add_index "contents", ["type"], :name => "index_contents_on_type"
 
     create_table "feedback", :force => true do |t|
       t.string   "type"
@@ -126,6 +126,8 @@ class InitialSchema < ActiveRecord::Migration
       t.integer "profile_id"
       t.integer "right_id"
     end
+    
+    add_index "profiles_rights", ["profile_id", "right_id"], :name => "index_profiles_rights"
 
     create_table "redirects", :force => true do |t|
       t.string "from_path"
@@ -239,23 +241,24 @@ class InitialSchema < ActiveRecord::Migration
   end
 
   def self.down
-    ActiveRecord::Base.transaction do
-      remove_index :articles, :permalink
-      remove_index :blacklist_patterns, :pattern
-      remove_index :comments, :article_id
-      remove_index :pings, :article_id
-      remove_index :trackbacks, :article_id
-
-      drop_table :users
-      drop_table :articles
-      drop_table :categories
-      drop_table :blacklist_patterns
-      drop_table :comments
-      drop_table :pings
-      drop_table :resources
-      drop_table :sessions
-      drop_table :settings
-      drop_table :trackbacks
-    end
+    remove_index :blacklist_patterns, :name => :index_blacklist_patterns_on_pattern
+    remove_index :cache_informations, :name => :index_cache_informations_on_path
+    remove_index :contents,           :name => :index_contents_on_published
+    remove_index :contents,           :name => :index_contents_on_text_filter_id
+    remove_index :contents,           :name => :index_contents_on_type
+    remove_index :page_caches,        :name => :index_page_caches_on_name
+    remove_index :feedback,           :name => :index_feedback_on_article_id
+    remove_index :feedback,           :name => :index_feedback_on_text_filter_id
+    remove_index :pings,              :name => :index_pings_on_article_id
+    remove_index :sessions,           :name => :index_sessions_on_sessid
+    remove_index :profiles_rights,    :name => :index_profiles_rights
+    remove_index :categories,         :name => :index_categories_on_permalink
+    
+    ["articles_tags", "blacklist_patterns", "blogs", "cache_informations", "categories",
+     "categorizations", "contents", "feedback", "notifications", "page_caches", "pings",
+     "profiles", "profiles_rights", "redirects", "resources", "rights", "sessions",
+     "sidebars", "sitealizer", "tags", "text_filters", "triggers",  "users"].each do |table|
+        drop_table table
+     end
   end
 end

@@ -13,6 +13,7 @@ module Typo::Bootstrap
     if initialize_profiles_and_rights
        initialize_textfilters
        initialize_articles
+       initialize_sidebars
     end
   end
  
@@ -20,6 +21,7 @@ module Typo::Bootstrap
     if teardown_profiels_and_rights
       teardown_texfilters
       teardown_articles
+      teardown_sidebars
     end
   end
 
@@ -181,9 +183,17 @@ module Typo::Bootstrap
     end
   end
 
+  def self.initialize_sidebars
+    # TODO: figure out adding of sidebar
+    Sidebar.transaction do
+    end
+  end
+  
   def self.teardown_profiels_and_rights
     return false if Profile.count <= 0
+    puts "warning!!!! purging Profiles and Rights"
     Profile.transaction do
+      User.destroy_all
       Blog.destroy_all
       Profile.destroy_all
       Right.destroy_all
@@ -193,10 +203,17 @@ module Typo::Bootstrap
   end
 
   def self.teardown_texfilters
+    puts "warning!!!! purging TextFilter configurations"
     TextFilter.destroy_all
   end
 
   def self.teardown_articles
+    puts "warning!!!! purging Articles and Pages"
     Content.destroy_all
+  end
+
+  def self.teardown_sidebars
+    puts "warning!!!! purging Sidebar configuration"
+    Sidebar.destroy_all
   end
 end
