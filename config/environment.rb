@@ -64,6 +64,7 @@ require 'rubypants'
 require 'uuidtools'
 
 require 'migrator'
+require 'bootstrap'
 require 'rails_patch/active_record'
 require 'login_system'
 require 'typo_version'
