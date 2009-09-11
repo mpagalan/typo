@@ -1,6 +1,6 @@
 module Migrator
   mattr_accessor :offer_migration_when_available
-  @@offer_migration_when_available = true
+  @@offer_migration_when_available = false
 
   def self.migrations_path
     "#{RAILS_ROOT}/db/migrate"
