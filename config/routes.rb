@@ -11,6 +11,18 @@ ActionController::Routing::Routes.draw do |map|
 
   map.admin 'admin', :controller  => 'admin/dashboard', :action => 'index'
 
+  #TODO: add more admin controller into this namespace
+  map.namespace :admin do |admin|
+    admin.resources :advanced
+    admin.resources :blacklist
+    admin.resources :cache,      :only => [:sweep_html],
+                                 :collection => {:sweep_html => :any}
+    admin.resources :categories, :collection => {:order => :get,
+                                                 :asort => :get,
+                                                 :category_container => :get}
+    admin.resources :profiles,   :only => [:index, :update]
+  end
+
   # make rss feed urls pretty and let them end in .xml
   # this improves caches_page because now apache and webrick will send out the
   # cached feeds with the correct xml mime type.
@@ -92,7 +104,7 @@ ActionController::Routing::Routes.draw do |map|
     map.connect "#{i}/:action/:id", :controller => i, :id => nil
   end
 
-  %w{advanced blacklist cache categories comments content profiles feedback general pages
+  %w{advanced content feedback general pages
      resources sidebar textfilters themes trackbacks users settings tags }.each do |i|
     map.connect "/admin/#{i}", :controller => "admin/#{i}", :action => 'index'
     map.connect "/admin/#{i}/:action/:id", :controller => "admin/#{i}", :action => nil, :id => nil
