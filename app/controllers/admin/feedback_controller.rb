@@ -4,26 +4,22 @@ class Admin::FeedbackController < Admin::BaseController
   before_filter :only_own_feedback, :only => [:delete]
 
   def index
-    conditions = ['1 = 1', {}]
-
+    feedbacks_to_find = Feedback.most_recent
+    #TODO tidy this up, and move it to a class method of Feedback
     if params[:search]
-      conditions.first << ' and (url like :pattern or author like :pattern or title like :pattern or ip like :pattern or email like :pattern)'
-      conditions.last.merge!(:pattern => "%#{params[:search]}%")
+      feedbacks_to_find = feedbacks_to_find.search(params[:seach])
     end
 
     if params[:published] == 'f'
-      conditions.first << ' and (published = :published)'
-      conditions.last.merge!(:published => false)
+      feedbacks_to_find = feedbacks_to_find.unpublished
     end
 
     if params[:confirmed] == 'f'
-      conditions.first << ' AND (status_confirmed = :status_confirmed)'
-      conditions.last.merge!(:status_confirmed => false)
+      feedbacks_to_find = feedbacks_to_find.unconfirmed
     end
 
     if params[:ham] == 'f'
-      conditions.first << ' AND state = :state '
-      conditions.last.merge!(:state => 'ham')
+      feedbacks_to_find = feedbacks_to_find.hams
     end
 
     # no need params[:page] if empty of == 0, there are a crash otherwise
@@ -31,11 +27,12 @@ class Admin::FeedbackController < Admin::BaseController
       params.delete(:page)
     end
 
-    @feedback = Feedback.paginate :page => params[:page], :order => 'feedback.created_at desc', :conditions => conditions, :per_page => this_blog.admin_display_elements
+    @feedback = feedbacks_to_find.paginate :page       => params[:page],
+                                           :per_page   => this_blog.admin_display_elements
   end
 
   def article
-    @article = Article.find(params[:id])
+    @article = Article.find(params[:article_id])
     if params[:ham] && params[:spam].blank?
       @comments = @article.comments.ham
     end

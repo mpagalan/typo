@@ -108,21 +108,21 @@ describe Admin::FeedbackController do
       end
 
       it 'should see all feedback on one article' do
-        get :article, :id => contents(:article1).id
+        get :article, :article_id => contents(:article1).id
         should_success_with_article_view(response)
         assigns(:article).should == contents(:article1)
         assigns(:comments).size.should == 2
       end
 
       it 'should see only spam feedback on one article' do
-        get :article, :id => contents(:article1).id, :spam => 'y'
+        get :article, :article_id => contents(:article1).id, :spam => 'y'
         should_success_with_article_view(response)
         assigns(:article).should == contents(:article1)
         assigns(:comments).size.should == 1
       end
 
       it 'should see only ham feedback on one article' do
-        get :article, :id => contents(:article1).id, :ham => 'y'
+        get :article, :article_id => contents(:article1).id, :ham => 'y'
         should_success_with_article_view(response)
         assigns(:article).should == contents(:article1)
         assigns(:comments).size.should == 1
@@ -130,7 +130,7 @@ describe Admin::FeedbackController do
 
       it 'should redirect_to index if bad article id' do
         lambda{
-          get :article, :id => 102302
+          get :article, :article_id => 102302
         }.should raise_error(ActiveRecord::RecordNotFound)
       end
 

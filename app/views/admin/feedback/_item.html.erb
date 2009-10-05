@@ -1,7 +1,7 @@
 <tr <%= alternate_class %>>
   <td><input class= "feedback_check" type="checkbox" name="feedback_check[<%= item.id %>]"/></td>
   <td class='<%= comment_class item.state %>'><%= item.state %></td>
-  <td><%= link_to item.article.title, :controller => 'feedback', :action => 'article', :id => item.article_id %></td>
+  <td><%= link_to item.article.title, article_admin_feedback_path(:article_id => item.article_id) %></td>
   <td>
     <%= link_to_unless item.url.blank?, ((h(item.author) || '(unknown)').slice(0,40)), item.url %><br />
     <%=h item.email.to_s.slice(0,40) %>

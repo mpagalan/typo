@@ -421,6 +421,7 @@ describe Article do
 
   describe '#published_at_like' do
     before do
+      Article.delete_all #NB cleanup previously created articles, this is due to fixtures loaded
       @article_last_month = Factory(:article, :published_at => 1.month.ago)
       @article_2_last_month = Factory(:article, :published_at => 1.month.ago)
 
