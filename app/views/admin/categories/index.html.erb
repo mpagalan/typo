@@ -1,11 +1,11 @@
-  <% @page_heading = _('Categories') +  "<span>&raquo; #{link_to(_('add new'), :controller => 'categories', :action => 'new')}</span>" %>
+  <% @page_heading = _('Categories') +  "<span>&raquo; #{link_to(_('add new'), new_admin_category_path)}</span>" %>
   <% subtabs_for(:content) %>
 
   <div id="category_container" class="list">	
     <%= render :partial => 'categories' %>  
-  </div>                      
+  </div>
 
   <div class="paginate">
-    <%= link_to_remote(_('Reorder'), :update => 'category_container', :url => { :action => 'reorder' }) %> |
-  	<%= link_to_remote(_('Sort alphabetically'), :update => 'category_container', :url => { :action => 'asort' }) %>
+    <%= link_to_remote(_('Reorder'), :update => 'category_container', :url => reorder_admin_categories_path) %> |
+  	<%= link_to_remote(_('Sort alphabetically'), :update => 'category_container', :url => asort_admin_categories_path) %>
   </div>

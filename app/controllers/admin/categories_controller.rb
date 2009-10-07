@@ -1,20 +1,34 @@
 class Admin::CategoriesController < Admin::BaseController
-
   cache_sweeper :blog_sweeper
+  
+  before_filter :find_resource, :only => [:edit, :update, :destroy]
+  before_filter :page_heading,  :only => [:new, :edit]
 
   def index
     @categories = Category.find(:all, :order => :position, :conditions => { :parent_id => nil })
   end
 
-  def new; new_or_edit ; end
-  def edit; new_or_edit;  end
+  def new
+    @category = Category.new
+  end
+  
+  def edit
+    render :action => "new"
+  end
+ 
+  def update
+    @category.attributes = params[:category]
+    save_category
+  end
 
+  def create
+    @category = Category.new(params[:category])
+    save_category
+  end
+ 
   def destroy
-    @category = Category.find(params[:id])
-    if request.post?
-      @category.destroy
-      redirect_to :action => 'index'
-    end
+    @category.destroy
+    redirect_to admin_categories_url
   end
 
   def order
@@ -39,28 +53,21 @@ class Admin::CategoriesController < Admin::BaseController
   
   private
   
-  def new_or_edit
-    @category = case params[:id]
-    when nil
-      Category.new
-    else
-      Category.find(params[:id])
-    end
-    @category.attributes = params[:category]
-    if request.post?
-      save_category
-      return
-    end    
-    render :action => 'new'
-  end
-  
   def save_category
-    if @category.save!
-      flash[:notice] = _('Category was successfully saved.') 
+    if @category.save
+      flash[:notice] = _('Category was successfully created.')
+      redirect_to admin_categories_url
     else
       flash[:error] = _('Category could not be saved.')
+      render :action => "new"
     end
-      redirect_to :action => 'index'
+  end
+
+  def find_resource
+    @category = Category.find(params[:id])
   end
   
+  def page_heading
+    @page_heading = _("%s Category", action_name.capitalize)
+  end
 end

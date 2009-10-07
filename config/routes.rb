@@ -11,17 +11,21 @@ ActionController::Routing::Routes.draw do |map|
 
   map.admin 'admin', :controller  => 'admin/dashboard', :action => 'index'
 
+  map.connect 'admin/content', :controller => 'admin/articles', :action => 'index'
   #TODO: add more admin controller into this namespace
   map.namespace :admin do |admin|
     admin.resources :advanced
     admin.resources :blacklist
     admin.resources :cache,      :only => [:sweep_html],
                                  :collection => {:sweep_html => :any}
-    admin.resources :categories, :collection => {:order => :get,
-                                                 :asort => :get,
+    admin.resources :categories, :collection => {:order    => :get,
+                                                 :reorder => :get,
+                                                 :asort    => :get,
                                                  :category_container => :get}
     admin.resources :profiles,   :only => [:index, :update]
     admin.resources :feedback,   :collection => {:article => :get}
+    admin.resources :articles
+    admin.resources :content
   end
 
   # make rss feed urls pretty and let them end in .xml
@@ -111,24 +115,26 @@ ActionController::Routing::Routes.draw do |map|
     map.connect "/admin/#{i}/:action/:id", :controller => "admin/#{i}", :action => nil, :id => nil
   end
 
-  map.connect '*from', :controller => 'redirect', :action => 'redirect'
+  #map.connect '*from', :controller => 'redirect', :action => 'redirect'
 
-  map.connect(':controller/:action/:id') do |default_route|
-    class << default_route
-      def recognize_with_deprecation(path, environment = {})
-        RAILS_DEFAULT_LOGGER.info "#{path} hit the default_route buffer"
-        recognize_without_deprecation(path, environment)
-      end
-      alias_method_chain :recognize, :deprecation
+  map.connect ':controller/:action/:id'
+  map.connect ':controller/:action/:id.:format'
+  #map.connect(':controller/:action/:id') do |default_route|
+  #  class << default_route
+  #    def recognize_with_deprecation(path, environment = {})
+  #      RAILS_DEFAULT_LOGGER.info "#{path} hit the default_route buffer"
+  #      recognize_without_deprecation(path, environment)
+  #    end
+  #    alias_method_chain :recognize, :deprecation
 
-      def generate_with_deprecation(options, hash, expire_on = {})
-        RAILS_DEFAULT_LOGGER.info "generate(#{options.inspect}, #{hash.inspect}, #{expire_on.inspect}) reached the default route"
-        #         if RAILS_ENV == 'test'
-        #           raise "Don't rely on default route generation"
-        #         end
-        generate_without_deprecation(options, hash, expire_on)
-      end
-      alias_method_chain :generate, :deprecation
-    end
-  end
+  #    def generate_with_deprecation(options, hash, expire_on = {})
+  #      RAILS_DEFAULT_LOGGER.info "generate(#{options.inspect}, #{hash.inspect}, #{expire_on.inspect}) reached the default route"
+  #      #         if RAILS_ENV == 'test'
+  #      #           raise "Don't rely on default route generation"
+  #      #         end
+  #      generate_without_deprecation(options, hash, expire_on)
+  #    end
+  #    alias_method_chain :generate, :deprecation
+  #  end
+  #end
 end

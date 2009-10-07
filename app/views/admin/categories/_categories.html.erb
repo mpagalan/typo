@@ -11,7 +11,7 @@
   
   <% for category in @categories -%>
   <tr <%= alternate_class -%> id="category_<%= category.id -%>">
-    <td><%= link_to_edit category.name, category %></td>
+    <td><%= link_to category.name, admin_category_path(:id => category.id) %></td>
     <td><%= link_to_permalink category, pluralize(category.articles.size, _('no articles') , _('1 article'), __('%d articles')) %></td>
   </tr>  
   <% end -%>
