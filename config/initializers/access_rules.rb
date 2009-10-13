@@ -49,18 +49,18 @@ AccessControl.map :require => [ :admin, :publisher, :contributor ]  do |map|
   map.permission "admin/textfilters"
 
   map.project_module :write, nil do |project|
-    project.menu    "Write",            { :controller => "admin/content",    :action => "new" }
+    project.menu    "Write",            { :controller => "admin/articles",      :action => "new" }
     project.submenu "Article",          { :controller => "admin/content",    :action => "new" }
 	  project.submenu "Page",             { :controller => "admin/pages",      :action => "new" }
   end
 
   map.project_module :content, nil do |project|
     project.menu    "Manage",           { :controller => "admin/content",    :action => "index" }
-    project.submenu "Articles",         { :controller => "admin/content",    :action => "index" }
-	project.submenu "Pages",            { :controller => "admin/pages",      :action => "index" }
-	project.submenu "Categories",       { :controller => "admin/categories", :action => "index" }
-	project.submenu "Uploads",          { :controller => "admin/resources",  :action => "index" }
-	project.submenu "Tags",             { :controller => "admin/tags",       :action => "index" }
+    project.submenu "Articles",         { :controller => "admin/articles",    :action => "index" }
+    project.submenu "Pages",            { :controller => "admin/pages",      :action => "index" }
+    project.submenu "Categories",       { :controller => "admin/categories", :action => "index" }
+    project.submenu "Uploads",          { :controller => "admin/resources",  :action => "index" }
+    project.submenu "Tags",             { :controller => "admin/tags",       :action => "index" }
   end
 
   map.project_module :feedback, nil do |project|

@@ -50,13 +50,13 @@ module Admin::BaseHelper
 
   def link_to_destroy(record, controller = @controller.controller_name)
     link_to image_tag('admin/delete.png', :alt => _("delete"), :title => _("Delete content")),
-      :controller => controller, :action => 'destroy', :id => record.id
+      {:controller => controller, :action => 'destroy', :id => record.id}, :method => :delete
   end
 
   def link_to_destroy_with_profiles(record, controller = @controller.controller_name)
     if current_user.admin? || current_user.id == record.user_id
       link_to(_("delete"), 
-        { :controller => controller, :action => 'destroy', :id => record.id }, :confirm => _("Are you sure?"), :method => :post, :title => _("Delete content"))
+        { :controller => controller, :action => 'destroy', :id => record.id }, :confirm => _("Are you sure?"), :method => :delete, :title => _("Delete content"))
       end
   end
 

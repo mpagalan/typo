@@ -86,9 +86,9 @@ module Article::States
       new_time = (new_time.to_time rescue nil)
       return if new_time.nil?
       content[:published_at] = new_time
-      if new_time > Time.now
-        content.state = :publication_pending
-      end
+      #if new_time > Time.now
+      #  content.state = :publication_pending
+      #end
     end
 
     def send_notifications
@@ -128,8 +128,8 @@ module Article::States
       new_time = (new_time.to_time rescue nil)
       content[:published_at] = new_time
       Trigger.remove(content, :trigger_method => 'publish!')
-      return if new_time.nil? || new_time <= Time.now
-      content.state = :publication_pending
+      #return if new_time.nil? || new_time <= Time.now
+      #content.state = :publication_pending
     end
   end
 
@@ -185,7 +185,8 @@ module Article::States
       new_time = (new_time.to_time rescue nil)
       return if new_time.nil? || new_time <= Time.now
       content[:published_at] = new_time
-      content.state = :publication_pending
+      #FIXME this makes the state(s) go in loop
+      #content.state = :publication_pending
     end
   end
 end

@@ -7,9 +7,8 @@ class Article < Content
   content_fields :body, :extended
 
   has_many :pings,      :dependent => :destroy, :order => "created_at ASC"
-
   has_many :comments,   :dependent => :destroy, :order => "created_at ASC" do
-
+    #FIXME this could be removed to use named_scopes on comments model or on feedbacks model
     # Get only ham or presumed_ham comments
     def ham
       find :all, :conditions => {:state => ["presumed_ham", "ham"]}
@@ -19,7 +18,6 @@ class Article < Content
     def spam
       find :all, :conditions => {:state => ["presumed_spam", "spam"]}
     end
-
   end
 
   with_options(:conditions => { :published => true }, :order => 'created_at DESC') do |this|
@@ -29,10 +27,8 @@ class Article < Content
   end
 
   has_many :trackbacks, :dependent => :destroy, :order => "created_at ASC"
-
   #TODO: change it because more logical with s in end : feedbacks
   has_many :feedback, :order => "created_at DESC"
-
   has_many :resources, :order => "created_at DESC",
            :class_name => "Resource", :foreign_key => 'article_id'
   after_destroy :fix_resources
@@ -44,11 +40,15 @@ class Article < Content
     :select => 'categories.*', \
     :uniq => true, \
     :order => 'categorizations.is_primary DESC'
-
   has_and_belongs_to_many :tags, :foreign_key => 'article_id'
-
-  named_scope :category, lambda {|category_id| {:conditions => ['categorizations.category_id = ?', category_id], :include => 'categorizations'}}
-  named_scope :drafts, :conditions => ['state = ?', 'draft']
+  
+  # --------------------------------------------------------------
+  # named scopes
+  named_scope :category, lambda {|category_id|
+    { :conditions => ['categorizations.category_id = ?', category_id],
+      :include => 'categorizations'}
+  }
+  named_scope :drafts,   :conditions => ['state = ?', 'draft']
 
 
   belongs_to :user
@@ -70,7 +70,20 @@ class Article < Content
 
 
   include Article::States
+  # --------------------------------------------------------------
+  # class methods
 
+  # returns a chainned name_scope
+  def self.search_without_drafts(search_hash)
+    search_scope = self.search_scopes(search_hash)
+    no_drafts_with_search_scope = search_scope.no_draft
+    
+    if search_hash[:category] and search_hash[:category].to_i > 0
+      no_drafts_with_search_scope  = no_drafts_with_search_scope.category(search_hash[:category])
+    end
+    return no_drafts_with_search_scope
+  end
+  
   class << self
     def published_articles
       find(:conditions => { :published => true }, :order => 'published_at DESC')
@@ -91,7 +104,7 @@ class Article < Content
       list_function << "paginate(paginate_hash)"
       eval(list_function.join('.'))
     end
-
+    
   end
 
   accents = { ['á','à','â','ä','ã','Ã','Ä','Â','À'] => 'a',
@@ -197,11 +210,11 @@ class Article < Content
   end
 
   def edit_url
-    blog.url_for(:controller => "/admin/content", :action =>"edit", :id => id)
+    blog.url_for(:controller => "/admin/articles", :action =>"edit", :id => id)
   end
 
   def delete_url
-    blog.url_for(:controller => "/admin/content", :action =>"destroy", :id => id)
+    blog.url_for(:controller => "/admin/articles", :action =>"destroy", :id => id)
   end
 
   def html_urls

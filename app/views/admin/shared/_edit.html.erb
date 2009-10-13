@@ -1,5 +1,7 @@
-<% className = form_action.delete(:class) %>
-<% form_tag(form_action, :id => "#{form_type}_form", :enctype => "multipart/form-data", :class => className) do %>
+<% form_for objectable, :url => form_action, :html => { :id => "#{objectable.last.class.to_s.downcase}_form",
+                                                        :multipart => true,
+                                                        :class => html_class } do |f| %>
+<%# form_tag(form_action, :id => "#{form_type}_form", :enctype => "multipart/form-data", :class => className) do %>
 
   <%= render :partial => "form" %>
 

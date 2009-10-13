@@ -41,12 +41,12 @@ describe Article do
 
   def test_edit_url
     a = contents(:article3)
-    assert_equal "http://myblog.net/admin/content/edit/#{a.id}", a.edit_url
+    assert_equal "http://myblog.net/admin/articles/#{a.id}/edit", a.edit_url
   end
 
   def test_delete_url
     a = contents(:article3)
-    assert_equal "http://myblog.net/admin/content/destroy/#{a.id}", a.delete_url
+    assert_equal "http://myblog.net/admin/articles/#{a.id}", a.delete_url
   end
 
   def test_feed_url
@@ -441,6 +441,26 @@ describe Article do
 
     it 'should return all content on this date if date send' do
       Article.published_at_like(2.month.ago.strftime('%Y-%m-%d')).map(&:id).sort.should == [@article_two_month_ago.id].sort
+    end
+  end
+
+  describe "#search_without_drafts" do
+    before do
+      Article.delete_all #NB cleanup previously created articles, this is due to fixtures loaded
+      @draft_article                = Factory(:article,  :published_at => 1.day.ago,  :state => 'draft')
+      @year_ago_published_article   = Factory(:article,  :published_at => 1.year.ago, :state => 'published')
+      @work_category                = Factory(:category, :name => 'work')
+      @published_with_work_category = Factory(:article,  :published_at => 1.day.ago, :state => 'published', :categories => [@work_category] )
+      @author_john                  = Factory(:user,     :login => 'john')
+      @published_with_author_john   = Factory(:article,  :published_at => 1.day.ago, :state => 'published', :user => @author_john)
+    end
+    
+    it "should find all non drafts article" do
+      Article.search_without_drafts({}).map(&:id).sort.should == [@year_ago_published_article.id, @published_with_work_category.id, @published_with_author_john.id].sort
+    end
+
+    it "should find all non drafts with work category as filter" do
+      Article.search_without_drafts({:category => @work_category.id}).should == [@published_with_work_category]
     end
   end
 end

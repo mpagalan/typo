@@ -1,0 +1,7 @@
+<% subtabs_for(:write) %>
+<%= render :partial => "drafts" %>
+<%= render :partial => "admin/shared/edit", :locals => { :objectable  => [:admin, @article],
+                                                         :form_action => (@article.new_record? ? admin_articles_path : admin_article_path(:id => @article.id)),
+                                                         :html_class  => 'autosave'} %>
+
+<%#= render :partial => "admin/shared/edit", :locals => { :form_type => "article", :form_action => { :action => "new", :id => @article.id , :class => ('autosave')} } %>

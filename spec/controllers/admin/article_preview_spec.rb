@@ -1,12 +1,11 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
-require 'admin/content_controller'
 require 'http_mock'
 require 'base64'
 
 class Admin::ContentController; def rescue_action(e) raise e end; end
 
 describe 'Admin::ArticlePreviewTest ported from Test::Unit style' do
-  controller_name 'admin/content'
+  controller_name 'admin/articles'
   integrate_views
 
   before do

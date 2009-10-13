@@ -57,6 +57,11 @@ Factory.define :category do |c|
   c.position 1
 end
 
+Factory.define :categorization do |f|
+  f.association :article, :factory => :article
+  f.association :category, :factory => :category
+end
+
 Factory.define :feedback do |f|
   f.sequence(:author) {|n| "typo author-#{n}"}
   f.sequence(:body)   {|n| "nice post -#{n} general feedback"}
