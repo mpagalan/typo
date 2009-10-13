@@ -24,7 +24,10 @@ ActionController::Routing::Routes.draw do |map|
                                                  :category_container => :get}
     admin.resources :profiles,   :only => [:index, :update]
     admin.resources :feedback,   :collection => {:article => :get}
-    admin.resources :articles
+    admin.resources :articles,   :collection => {:insert_editor => :get,
+                                                 :attachment_box_add => :get,
+                                                 :auto_complete_for_keywords => :get},
+                                 :member     => {:update_resource => [:put , :delete]}
     admin.resources :content
   end
 
@@ -109,7 +112,7 @@ ActionController::Routing::Routes.draw do |map|
     map.connect "#{i}/:action/:id", :controller => i, :id => nil
   end
 
-  %w{advanced content general pages
+  %w{advanced general pages
      resources sidebar textfilters themes trackbacks users settings tags }.each do |i|
     map.connect "/admin/#{i}", :controller => "admin/#{i}", :action => 'index'
     map.connect "/admin/#{i}/:action/:id", :controller => "admin/#{i}", :action => nil, :id => nil
