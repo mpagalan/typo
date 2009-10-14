@@ -3,6 +3,15 @@ class Feedback < Content
   # Empty, for now, ready to hoist up methods from Comment & Trackback
   set_table_name "feedback"
 
+  named_scope :unconfirmed, :conditions => ['status_confirmed = ?', false]
+  named_scope :unpublished, :conditions => ['published = ?', false]
+  named_scope :hams,        :conditions => ['state = ?', 'ham']
+  named_scope :most_recent, :order      => "created_at DESC"
+  named_scope :search,      lambda { |query_string|
+    {:conditions => ["url LIKE :pattern OR LOWER(author) LIKE :pattern OR 
+                      LOWER(title) LIKE :pattern OR ip LIKE :pattern  OR email LIKE :pattern", {:pattern => "%#{query_string.strip.downcase}%"}]}
+  }
+
   include TypoGuid
 
   validate_on_create :feedback_not_closed

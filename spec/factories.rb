@@ -25,6 +25,13 @@ Factory.define :article_with_accent_in_html, :parent => :article do |a|
   a.published_at Time.now - 2.seconds
 end
 
+Factory.define :pingable_and_commentable_article, :parent => :article do |f|
+  f.sequence(:title) {|n| "a pingable article-#{n}"}
+  f.allow_pings    true
+  f.allow_comments true
+  f.published      true
+end
+
 Factory.define :blog do |b|
 end
 
@@ -48,4 +55,22 @@ Factory.define :category do |c|
   c.name 'SoftwareFactory'
   c.permalink 'softwarefactory'
   c.position 1
+end
+
+Factory.define :feedback do |f|
+  f.sequence(:author) {|n| "typo author-#{n}"}
+  f.sequence(:body)   {|n| "nice post -#{n} general feedback"}
+  f.sequence(:ip)     {|n| "255.0.0.#{255-n}"}
+  f.association :article, :factory => :pingable_and_commentable_article
+end
+
+Factory.define :comment, :parent => :feedback, :class => :comment do |f|
+  f.sequence(:body) {|n| "nice post -#{n} as comment"}
+end
+
+Factory.define :trackback, :parent => :feedback, :class => :trackback do |f|
+  f.sequence(:blog_name) {|n| "Some Blog-#{n}"}
+  f.sequence(:title)     {|n| "as blog to remember-#{n}"}
+  f.sequence(:excerpt)   {|n| "....... remember... #{n}"}
+  f.url "www.example.com"
 end

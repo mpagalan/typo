@@ -306,3 +306,74 @@ describe Admin::FeedbackController do
   end
 
 end
+
+describe Admin::FeedbackController, "on more resource oriented" do
+  def mock_feedback(stubs={})
+    @mock_feedback ||= mock_model(Feedback, stubs)
+  end
+
+  before(:each) do
+    @user = users(:tobi)
+    request.session = {:user => @user.id}
+  end
+
+  describe "GET index" do
+    before(:each) do
+      @proxy_scope = mock("proxy_scope")
+      Feedback.should_receive(:most_recent).and_return(@proxy_scope)
+    end
+
+    def get_index(params={})
+      get :index, params
+    end
+
+    #FIXME proper variable naming of feedback, it must be plural
+    it "assigns feebacks as @feedback" do
+      @proxy_scope.stub!(:paginate).and_return([mock_feedback])
+      get_index
+      assigns[:feedback].should == [mock_feedback]
+    end
+
+    it "should chain on search named scope if search params is not blank?" do
+      @proxy_scope.should_receive(:search).with("qwerty").and_return(@proxy_scope)
+      @proxy_scope.stub!(:paginate).and_return([])
+      get_index :search => "qwerty"
+    end
+    
+    it "should not chain on search named scope if search params is blank?" do
+      @proxy_scope.should_not_receive(:search).with(" ")
+      @proxy_scope.stub!(:paginate).and_return([])
+      get_index :search => " "
+    end
+
+    it "should chain on unpublished named scope if published is 'f'" do
+      @proxy_scope.should_receive(:unpublished).and_return(@proxy_scope)
+      @proxy_scope.stub!(:paginate).and_return([])
+      get_index :published => "f"
+    end
+    
+    it "should not chain on unpublished named scope if published is not 'f'" do
+      @proxy_scope.should_not_receive(:unpublished)
+      @proxy_scope.stub!(:paginate).and_return([mock_feedback])
+      get_index :published => "z"
+    end
+
+    it "should chain on unconfirmed named scope if confirmed is 'f'" do
+      @proxy_scope.should_receive(:unconfirmed).and_return(@proxy_scope)
+      @proxy_scope.stub!(:paginate).and_return([])
+      get_index :confirmed => "f"
+    end
+
+    it "should chain on hams named scope if ham is 'f'" do
+      @proxy_scope.should_receive(:hams).and_return(@proxy_scope)
+      @proxy_scope.stub!(:paginate).and_return([])
+      get_index :ham => 'f'
+    end
+
+    it "should not chain on hams named scope if ham is not 'f'" do
+      @proxy_scope.should_not_receive(:hams)
+      @proxy_scope.stub!(:paginate).and_return([])
+      get_index :ham => 's'
+    end
+  end
+end
