@@ -6,8 +6,8 @@ class Admin::FeedbackController < Admin::BaseController
   def index
     feedbacks_to_find = Feedback.most_recent
     #TODO tidy this up, and move it to a class method of Feedback
-    if params[:search]
-      feedbacks_to_find = feedbacks_to_find.search(params[:seach])
+    unless params[:search].blank?
+      feedbacks_to_find = feedbacks_to_find.search(params[:search])
     end
 
     if params[:published] == 'f'
