@@ -45,6 +45,7 @@ module CkeditorFileUtils
     backup_config = File.join(RAILS_ROOT, '/public/javascripts/ckeditor/config.bak')
     config_symlink = File.join(RAILS_ROOT, '/public/javascripts/ckeditor/config.js')
     FileUtils.cp(config_file, dest) unless File.exist?(dest)
+    return if File.exist?(config_symlink)
     if File.exist?(config_symlink)
       unless File.symlink?(config_symlink)
         FileUtils.rm(backup_config) if File.exist?(backup_config)
