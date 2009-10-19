@@ -65,6 +65,26 @@ class Content < ActiveRecord::Base
     end
   end
 
+  def self.search_scopes(search_hash={})
+    default_search_scope = self.order("created_at DESC")
+    if search_hash[:searchstring]
+      default_search_scope = default_search_scope.searchstring(search_hash[:searchstring])
+    end
+    if search_hash[:published_at] and %r{(\d\d\d\d)-(\d\d)} =~ search_hash[:published_at]
+      default_search_scope = default_search_scope.published_at_like(search_hash[:published_at])
+    end
+
+    if search_hash[:user_id] && search_hash[:user_id].to_i > 0
+      default_search_scope = default_search_scope.user_id(search_hash[:user_id])
+    end
+
+    if search_hash[:published]
+      default_search_scope = default_search_scope.published  if search_hash[:published].to_s == '1'
+      default_search_scope = default_search_scope.not_published if search_hash[:published].to_s == '0'
+    end
+    return default_search_scope
+  end
+
   class << self
     # Quite a bit of this isn't needed anymore.
     def content_fields(*attribs)
